@@ -1,5 +1,7 @@
 package io.pivotal.web.domain;
 
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +32,6 @@ public class MarketSummary {
 
 	public void setTopLosers(List<Quote> topLosers) {
 		this.topLosers = topLosers;
-		this.initialised = true;
 	}
 
 	public List<Quote> getTopGainers() {
@@ -90,7 +91,7 @@ public class MarketSummary {
 	}
 
 	public boolean isInitialised() {
-		return initialised;
+		return !CollectionUtils.isEmpty(this.topLosers) && !CollectionUtils.isEmpty(topGainers);
 	}
 
 	@Override

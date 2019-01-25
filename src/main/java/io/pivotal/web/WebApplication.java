@@ -2,6 +2,7 @@ package io.pivotal.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -9,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = RedisReactiveAutoConfiguration.class)
 @EnableDiscoveryClient
 @EnableCircuitBreaker
 @EnableScheduling

@@ -2,17 +2,23 @@ package io.pivotal.web.service;
 
 import com.newrelic.api.agent.Trace;
 import io.pivotal.web.domain.CompanyInfo;
+import io.pivotal.web.domain.Portfolio;
 import io.pivotal.web.domain.Quote;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.cloud.netflix.hystrix.HystrixCommands;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 import java.util.*;
+
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient;
 
 
 @Service
@@ -77,11 +83,18 @@ public class QuotesService {
 	public List<Quote> getMultipleQuotes(String symbols) {
 		logger.debug("retrieving multiple quotes: " + symbols);
 		ParameterizedTypeReference<List<Quote>> typeRef = new ParameterizedTypeReference<List<Quote>>() {};
-		List<Quote> quotes = webClient
+		Publisher<List<Quote>> quotesPublisher = webClient
 				.get()
 				.uri("//" + quotesService + "/v1/quotes?q=" + symbols)
 				.retrieve()
-				.bodyToMono(typeRef)
+				.bodyToMono(typeRef);
+
+		List<Quote> quotes = HystrixCommands
+				.from( quotesPublisher )
+				.eager()
+				.commandName("multipleQuiotes")
+				.fallback(Flux.just(new ArrayList<>()))
+				.toMono()
 				.block();
 
 		//Quote[] quotesArr = restTemplate.getForObject("//" + quotesService + "/v1/quotes?q={symbols}", Quote[].class, symbols);
@@ -90,6 +103,9 @@ public class QuotesService {
 		return quotes;
 		
 	}
+
+
+
 	/**
 	 * Retrieve multiple quotes.
 	 * 

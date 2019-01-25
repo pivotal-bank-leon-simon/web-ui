@@ -11,6 +11,6 @@
 	<div sec:authorize="!isAuthenticated()" class="container">
 		<div th:include="fragments/registration_fragment :: registration"></div>
 	</div>
-
+	<div th:utext="${T(com.newrelic.api.agent.NewRelic).getBrowserTimingFooter()}"></div>
 </body>
 </html>

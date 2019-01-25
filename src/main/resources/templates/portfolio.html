@@ -27,7 +27,7 @@
 		</div>
 	</div>
 	<div th:include="fragments/quote_attribution_fragment :: quote_attribution"></div>
-
+	<div th:utext="${T(com.newrelic.api.agent.NewRelic).getBrowserTimingFooter()}"></div>
 
 </body>
 </html>
